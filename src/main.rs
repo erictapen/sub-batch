@@ -28,20 +28,19 @@ fn main() {
     let catch = std::panic::catch_unwind(|| {
         if let Err(e) = run() {
             eprintln!("error: {}", e);
-            process::exit(1);
+            exit_error();
         }
     });
 
     if catch.is_err() {
-        let _ = terminal::disable_raw_mode();
-        process::exit(1);
+        exit_error();
     }
+    let _ = terminal::disable_raw_mode();
 }
 
 fn setup_signal_handler() {
     let handler = ctrlc::set_handler(|| {
-        let _ = terminal::disable_raw_mode();
-        process::exit(1);
+        exit_error();
     });
 
     if handler.is_err() {
@@ -61,4 +60,9 @@ fn run() -> AnyResult<()> {
     }?;
 
     Ok(())
+}
+
+fn exit_error() {
+    let _ = terminal::disable_raw_mode();
+    process::exit(1);
 }

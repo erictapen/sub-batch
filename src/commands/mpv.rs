@@ -41,14 +41,14 @@ impl MpvCommand {
             .arg(format!("--input-ipc-server={}", socket_file.display()))
             .stdout(Stdio::null())
             .stderr(Stdio::null())
+            .stdin(Stdio::null())
             .spawn()?;
 
         let mut conn = MpvConnection::connect(&socket_file)?;
 
         terminal::enable_raw_mode()?;
-        let result = self.start_shift_loop(&mut conn);
+        self.start_shift_loop(&mut conn)?;
         terminal::disable_raw_mode()?;
-        result?;
 
         let _ = child.kill();
         let _ = child.wait();
@@ -95,6 +95,7 @@ impl MpvCommand {
                     .execute(Print(format!("shift: {}ms", time_shift)))?;
             }
         }
+        println!();
         Ok(())
     }
 
